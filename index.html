@@ -32,6 +32,21 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
+        .title-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+
+        .signature {
+            font-size: 11px;
+            font-weight: 500;
+            color: #64748b;
+            padding-bottom: 3px;
+        }
+        
         h2 {
             text-align: center;
             margin-bottom: 28px;
@@ -200,7 +215,10 @@
 <body>
 
 <div class="container">
+    <div class="title-wrapper">
     <h2>📊 내신 등급 계산기</h2>
+    <span class="signature">by BIOKIM:D</span>
+</div>
     
     <div class="setup-section">
         <label for="subjectCount">성적이 나온 과목 수 선택:</label>
