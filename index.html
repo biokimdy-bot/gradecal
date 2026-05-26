@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>창원명지여고 1차고사 5등급제 판독기</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 780px;
+            width: 100%;
+            background: var(--card-background);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            color: #111827;
+            font-size: 24px;
+        }
+
+        .setup-section {
+            background-color: #f1f5f9;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .setup-section label {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .setup-section select {
+            width: 120px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-weight: 600;
+        }
+
+        /* 도움말 가이드 박스 */
+        .info-guide-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #166534;
+        }
+
+        .subject-row {
+            display: grid;
+            grid-template-columns: 2fr 1.3fr 1.5fr 1.7fr;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 최상단 헤더 열 스타일 수정 */
+        .row-header {
+            font-weight: 700;
+            font-size: 14px;
+            color: #334155;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 12px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .row-header div {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        /* 헤더 안의 작은 가이드 설명 */
+        .header-hint {
+            font-size: 11px;
+            font-weight: 500;
+            color: #64748b;
+        }
+        
+        .header-hint.highlight {
+            color: #0284c7;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input[readonly] {
+            background-color: #f8fafc;
+            color: #64748b;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 25px;
+        }
+
+        button:hover {
+            background-color: #4338ca;
+        }
+
+        /* 결과 테이블 스타일 */
+        .result-section {
+            display: none;
+            margin-top: 35px;
+        }
+
+        .result-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #111827;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .result-table th, .result-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .result-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .grade-1 { background-color: #dbeafe; color: #1e40af; }
+        .grade-2 { background-color: #e0f2fe; color: #0369a1; }
+        .grade-3 { background-color: #f0fdf4; color: #166534; }
+        .grade-4 { background-color: #fff7ed; color: #9a3412; }
+        .grade-5 { background-color: #f1f5f9; color: #475569; }
+
+        .warning-text {
+            color: #df4759;
+            font-weight: 600;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 내신 등급 계산기</h2>
+    
+    <div class="setup-section">
+        <label for="subjectCount">성적이 나온 과목 수 선택:</label>
+        <select id="subjectCount" onchange="generateRows()">
+            <option value="1">1개 과목</option>
+            <option value="2">2개 과목</option>
+            <option value="3">3개 과목</option>
+            <option value="4">4개 과목</option>
+            <option value="5">5개 과목</option>
+            <option value="6">6개 과목</option>
+            <option value="7">7개 과목</option>
+        </select>
+    </div>
+
+    <div class="info-guide-box">
+        💡 <b>성적 확인 안내:</b> 등수 뒤에 괄호 <code>( )</code>가 있으면 동석차 수 칸에 그 숫자를 입력하고, 괄호가 없으면 공동 등수가 없으므로 <code>1</code>을 그대로 두시면 됩니다.
+    </div>
+
+    <div id="inputFormArea">
+        <div class="subject-row row-header">
+            <div>
+                <span>과목명</span>
+                <span class="header-hint">과목 선택</span>
+            </div>
+            <div>
+                <span>수강자 수</span>
+                <span class="header-hint">자동 반영</span>
+            </div>
+            <div>
+                <span>본인 석차</span>
+                <span class="header-hint">내 등수 입력</span>
+            </div>
+            <div>
+                <span>동석차 수</span>
+                <span class="header-hint highlight">괄호 안 숫자 (없으면 1)</span>
+            </div>
+        </div>
+        <div id="dynamicRows"></div>
+    </div>
+
+    <button onclick="calculateAllGrades()">모든 과목 일괄 판독하기</button>
+
+    <div class="result-section" id="resultSection">
+        <h3>✨ 과목별 예상 등급 판독 결과</h3>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>과목명</th>
+                    <th>총원</th>
+                    <th>석차</th>
+                    <th>백분위</th>
+                    <th>예상 등급</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody id="resultTableBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const subjectStudents = {
+    "문학": 165, "대수": 165, "영어1": 165, "일본어": 139, 
+    "중국어": 26, "기하": 19, "세계사": 26, "현대사회와 윤리": 100, 
+    "사회문제 탐구": 61, "화학": 61, "생명과학": 91
+};
+
+const subjectOptions = Object.keys(subjectStudents);
+
+function generateRows() {
+    const count = parseInt(document.getElementById('subjectCount').value);
+    const container = document.getElementById('dynamicRows');
+    container.innerHTML = ''; 
+
+    for (let i = 0; i < count; i++) {
+        const row = document.createElement('div');
+        row.className = 'subject-row';
+
+        let optionsHtml = '';
+        subjectOptions.forEach((sub, idx) => {
+            const selected = (idx === i % subjectOptions.length) ? 'selected' : '';
+            optionsHtml += `<option value="${sub}" ${selected}>${sub}</option>`;
+        });
+
+        // 행 내부의 자잘한 안내 문구들을 제거하여 세로 간격을 줄이고 깔끔하게 처리
+        row.innerHTML = `
+            <div>
+                <select class="sel-sub" data-index="${i}" onchange="syncStudentCount(${i})">
+                    ${optionsHtml}
+                </select>
+            </div>
+            <div>
+                <input type="text" class="in-total" id="total-${i}" readonly>
+            </div>
+            <div>
+                <input type="number" class="in-rank" id="rank-${i}" placeholder="예: 5" min="1">
+            </div>
+            <div>
+                <input type="number" class="in-same" id="same-${i}" value="1" min="1">
+            </div>
+        `;
+        container.appendChild(row);
+        syncStudentCount(i); 
+    }
+}
+
+function syncStudentCount(index) {
+    const selectEl = document.querySelector(`.sel-sub[data-index="${index}"]`);
+    const totalInput = document.getElementById(`total-${index}`);
+    if (selectEl && totalInput) {
+        const selectedSubject = selectEl.value;
+        totalInput.value = `${subjectStudents[selectedSubject]}명`;
+    }
+}
+
+function calculateAllGrades() {
+    const count = parseInt(document.getElementById('subjectCount').value);
+    const tableBody = document.getElementById('resultTableBody');
+    tableBody.innerHTML = ''; 
+
+    let hasError = false;
+    let rowsHtml = '';
+
+    for (let i = 0; i < count; i++) {
+        const subject = document.querySelector(`.sel-sub[data-index="${i}"]`).value;
+        const totalStudents = subjectStudents[subject];
+        const rank = parseInt(document.getElementById(`rank-${i}`).value);
+        const sameRank = parseInt(document.getElementById(`same-${i}`).value);
+
+        if (!rank || !sameRank) {
+            alert(`${i+1}번째 과목의 석차와 동석차 수를 정확히 입력해 주세요.`);
+            hasError = true;
+            break;
+        }
+        if (rank > totalStudents) {
+            alert(`[${subject}]의 석차는 해당 과목 총원(${totalStudents}명)을 초과할 수 없습니다.`);
+            hasError = true;
+            break;
+        }
+
+        const intermediateRank = Math.round(rank + (sameRank - 1) / 2);
+        const percentage = (intermediateRank / totalStudents) * 100;
+
+        let grade = 5;
+        if (percentage <= 10) grade = 1;
+        else if (percentage <= 34) grade = 2;
+        else if (percentage <= 66) grade = 3;
+        else if (percentage <= 90) grade = 4;
+
+        const maxRankInTie = rank + sameRank - 1;
+        const maxPercentage = (maxRankInTie / totalStudents) * 100;
+        let note = '-';
+        if ((grade === 1 && maxPercentage > 10) || (grade === 2 && maxPercentage > 34)) {
+            note = `<span class="warning-text">⚠️ 동점자 과다<br>등급하락 유의</span>`;
+        }
+
+        rowsHtml += `
+            <tr>
+                <td style="font-weight:600;">${subject}</td>
+                <td>${totalStudents}명</td>
+                <td>${intermediateRank.toFixed(0)}등</td>
+                <td>${percentage.toFixed(2)}%</td>
+                <td><span class="grade-badge grade-${grade}">${grade}등급</span></td>
+                <td>${note}</td>
+            </tr>
+        `;
+    }
+
+    if (!hasError) {
+        tableBody.innerHTML = rowsHtml;
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+window.onload = function() {
+    generateRows();
+};
+</script>
+
+</body>
+</html>
