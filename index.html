@@ -216,7 +216,7 @@
 
 <div class="container">
     <div class="title-wrapper">
-    <h2>📊 내신 등급 계산기</h2>
+    <h2>📊 내신 등급 계산기 v1.1</h2>
     <span class="signature">by BIOKIM:D</span>
 </div>
     
@@ -363,18 +363,27 @@ function calculateAllGrades() {
         const intermediateRank = Math.round(rank + (sameRank - 1) / 2);
         const percentage = (intermediateRank / totalStudents) * 100;
 
-        let grade = 5;
-        if (percentage <= 10) grade = 1;
-        else if (percentage <= 34) grade = 2;
-        else if (percentage <= 66) grade = 3;
-        else if (percentage <= 90) grade = 4;
+        // 각 등급별 반올림 커트라인 등수를 먼저 계산 (훈령 기준)
+const cutGrade1 = Math.round(totalStudents * 0.10); // 1등급 컷 등수
+const cutGrade2 = Math.round(totalStudents * 0.34); // 2등급 컷 등수
+const cutGrade3 = Math.round(totalStudents * 0.66); // 3등급 컷 등수
+const cutGrade4 = Math.round(totalStudents * 0.90); // 4등급 컷 등수
 
-        const maxRankInTie = rank + sameRank - 1;
-        const maxPercentage = (maxRankInTie / totalStudents) * 100;
-        let note = '-';
-        if ((grade === 1 && maxPercentage > 10) || (grade === 2 && maxPercentage > 34)) {
-            note = `<span class="warning-text">⚠️ 동점자 과다<br>등급하락 유의</span>`;
-        }
+// 학생의 중간석차가 반올림 컷 안에 들어오는지로 등급 판정
+let grade = 5;
+if (intermediateRank <= cutGrade1) grade = 1;
+else if (intermediateRank <= cutGrade2) grade = 2;
+else if (intermediateRank <= cutGrade3) grade = 3;
+else if (intermediateRank <= cutGrade4) grade = 4;
+
+        // 동점자가 다 다 불어났을 때의 최하위 등수
+const maxRankInTie = rank + sameRank - 1; 
+let note = '-';
+
+// 동점자 최하위 등수가 등급 컷 등수를 넘어가 버리면 경고
+if ((grade === 1 && maxRankInTie > cutGrade1) || (grade === 2 && maxRankInTie > cutGrade2)) {
+    note = `<span class="warning-text">⚠️ 동점자 과다<br>등급하락 유의</span>`;
+}
 
         rowsHtml += `
             <tr>
